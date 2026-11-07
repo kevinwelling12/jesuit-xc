@@ -26,6 +26,10 @@ APP = '<script id="portal-app">'
 assert html.count(APP) == 1
 html = html.replace(APP, '<script type="text/x-jx-app" id="portal-app">')
 head = (f'<script>window.JX_BUILD={BUILD!r};window.JX_PORTAL="xc";</script>\n'
+        '<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">\n'
+        '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n<link rel="manifest" href="manifest.webmanifest">\n'
+        '<meta name="theme-color" content="#231F20">\n<meta name="apple-mobile-web-app-capable" content="yes">\n'
+        '<meta name="mobile-web-app-capable" content="yes">\n'
         '<meta name="apple-mobile-web-app-title" content="Jesuit XC">\n'
         '<style>' + src('gate.css') + '</style>\n' + sdk + '<script>' + src('firebase-config.js') + '</script>\n')
 html = html.replace('</head>', head + '</head>', 1)
@@ -33,5 +37,12 @@ html = re.sub(r'(<body[^>]*>)', lambda m: m.group(1) + '\n' + src('gate.html'), 
 html = html.replace('</body>', '<script>' + src('gate.js') + '</script>\n</body>', 1)
 dest = root / 'dist' / 'index.html'
 dest.parent.mkdir(exist_ok=True)
+# home screen icons (src/static, made from the Jesuit mascot art Kevin supplied) and the Android install manifest
+import json, shutil
+for f in (root / 'src' / 'static').iterdir(): shutil.copy(f, root / 'dist' / f.name)
+(root / 'dist' / 'manifest.webmanifest').write_text(json.dumps(dict(
+    name='Jesuit XC', short_name='Jesuit XC', start_url='./', scope='./', display='standalone',
+    background_color='#FFFFFF', theme_color='#231F20',
+    icons=[dict(src='icon-192.png', sizes='192x192', type='image/png'), dict(src='icon-512.png', sizes='512x512', type='image/png')]), indent=1))
 dest.write_text(html)
 print(f'wrote dist/index.html ({len(html):,} bytes)')

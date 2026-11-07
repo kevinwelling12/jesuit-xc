@@ -14,6 +14,9 @@ portal (../../delta-hawks/web, read only); no shared code.
   {role: admin|coach, name, added, by}; portals/xc {version, chunks, bytes, as_of, updated}; portals/xc/chunks/NNN
   {data: gzipped JSON}. Gate behavior and checks follow Delta Hawks web/CLAUDE.md (saved copy in IndexedDB 'jesuit-xc',
   member memo 'jx-member', 20 s watchdog, version stamp in the footer).
+- Icons (src/static, copied to dist/ by build.py with manifest.webmanifest): made 2026-11-07 from the Jesuit mascot
+  art Kevin supplied (JHS pirate in a gold ring): apple-touch-icon 180, icon-192, icon-512 (art at 92% on white so the
+  ring clears iOS's rounded corners), favicon-32. Use the supplied art only; never redraw or alter the mark.
 - After any gate or rules change: a signed-out REST read of portals/xc must return 403, and the live page must show the
   sign-in card with no console errors.
 - Look: Kevin's Jesuit Sacramento design system (https://claude.ai/artifact/WennPLMmW69KLVtk1adtp3, project/tokens.json).
