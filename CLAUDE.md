@@ -1,0 +1,24 @@
+# CLAUDE.md: Jesuit XC web portal
+
+Public repo. Never add athlete data, names, CSV or JSON data files here. The data pipeline lives in the sibling folder
+../pipeline (private, not in git; read its CLAUDE.md for the model and data). Copied in design from Kevin's Delta Hawks web
+portal (../../delta-hawks/web, read only); no shared code.
+
+- templates/portal_template.html: the portal page, single source for the local build and the signed-in web build. The
+  pipeline's scripts/build_portal.py replaces `__DATA__` with data/portal_data.json (from scripts/portal_data.py) and writes
+  ../pipeline/portal/jesuit_xc_portal.html, which stays local. The web build (milestone 3) will leave `window.D` empty and
+  load the data after a coach signs in.
+- Look: Kevin's Jesuit Sacramento design system (https://claude.ai/artifact/WennPLMmW69KLVtk1adtp3, project/tokens.json).
+  Positive theme on white, reverse on JHS Black (#231F20); accent red #C41230 in light, gold #FDB913 in dark; gold never as
+  text on white, red never as text on black; header band is block-deep with the athletic face (Eurostile, falling back to
+  Helvetica Neue) in gold. Text only: no logo art, and the guide forbids recreating the mark. Radii 0-4 px. Jesuit rows
+  get a light gold tint with a gold left edge.
+- Tabs: Roster (rating = Willow Hills 5K today), Runner (chart of every race as a Willow Hills 5K on its day; history with
+  the strict pre-meet expected time, shifted by how the rest of the field ran, and the 8-in-10 range), Meets (Report,
+  Results, Team scores), Projections (Section finals and State for every current runner, distinct places by projected
+  time), Simulation (section_sim.py results, shown when data has D.sims), Model (strict backtest).
+- Team scores are unofficial: teams of 5+, top 5 score, 6th and 7th displace, exhibition and unattached left out.
+- Before any commit: run ../pipeline/scripts/check_web_clean.py, which searches this repo for every athlete name in the
+  master and any data file. It must report clean. Never write a runner's name here, even as an example.
+- Serve local test pages only on 127.0.0.1 from the scratchpad, never the pipeline's portal/ folder, never all interfaces.
+- Kevin prefers plain, direct writing: no em dashes, no filler.

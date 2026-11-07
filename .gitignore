@@ -1,0 +1,8 @@
+# Public repo: athlete data never lives here.
+*.csv
+*.xlsx
+data/
+portal_data*.json
+dist/
+.DS_Store
+__pycache__/

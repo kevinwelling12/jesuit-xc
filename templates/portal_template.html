@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Jesuit XC Portal</title>
+<style>
+/* Jesuit Sacramento design system (tokens.json): positive theme on white, reverse on JHS Black.
+   Red and gold are the school colors; gold is never text on white; red is never text on black. Radii 0-4 px. */
+:root{
+ --jhs-red:#C41230;--jhs-gold:#FDB913;--jhs-charcoal:#5F6062;--jhs-black:#231F20;--jhs-metal:#B4975A;
+ --bg:#FFFFFF;--panel:#F5F4F2;--ink:#231F20;--muted:#5F6062;--faint:#8A8B8D;--line:#DCDBD8;--rule:#5F6062;
+ --accent:#C41230;--on-accent:#FFFFFF;--deep:#231F20;--band-ink:#FDB913;--band-muted:#D9D6D0;
+ --ours:rgba(253,185,19,.22);--ours-edge:#FDB913;--good:#1F7A48;--bad:#C41230;--bar:#5F6062;--bar-ours:#C41230;
+ --athletic:Eurostile,"Eurostile Extended",Microgramma,"Helvetica Neue",Helvetica,Arial,sans-serif;
+ --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;--pad:16px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#231F20;--panel:#2E2A2B;--ink:#FFFFFF;--muted:#B4975A;--faint:#8F8A80;--line:#433E3F;--rule:#B4975A;
+ --accent:#FDB913;--on-accent:#231F20;--deep:#5F6062;--band-ink:#FDB913;--band-muted:#E6E3DD;
+ --ours:rgba(253,185,19,.09);--ours-edge:#FDB913;--good:#6FCF97;--bad:#FF8A80;--bar:#8F8A80;--bar-ours:#FDB913;color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#231F20;--panel:#2E2A2B;--ink:#FFFFFF;--muted:#B4975A;--faint:#8F8A80;--line:#433E3F;--rule:#B4975A;
+ --accent:#FDB913;--on-accent:#231F20;--deep:#5F6062;--band-ink:#FDB913;--band-muted:#E6E3DD;
+ --ours:rgba(253,185,19,.09);--ours-edge:#FDB913;--good:#6FCF97;--bad:#FF8A80;--bar:#8F8A80;--bar-ours:#FDB913;color-scheme:dark}
+@media (min-width:720px){:root{--pad:24px}}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:400 15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom,0)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+a{color:var(--accent);text-underline-offset:3px}
+.num{font-variant-numeric:tabular-nums}
+
+/* header band: block-deep with the athletic face in gold (text only; no logo art is recreated) */
+.band{background:var(--deep);color:#fff;padding-top:env(safe-area-inset-top,0)}
+.top{max-width:1040px;margin:0 auto;padding:20px var(--pad) 14px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:6px 24px}
+.top h1{margin:0;font:700 clamp(22px,5vw,30px)/1.05 var(--athletic);letter-spacing:.08em;text-transform:uppercase;color:var(--band-ink)}
+.top p{margin:0;color:var(--band-muted);font:600 13px/1.3 var(--athletic);letter-spacing:.12em;text-transform:uppercase}
+.tabs{position:sticky;top:0;z-index:5;background:var(--deep);border-top:1px solid rgba(255,255,255,.12)}
+.tabs-in{max-width:1040px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;padding:0 calc(var(--pad) - 12px)}
+.tabs-in::-webkit-scrollbar{display:none}
+.tabs button{background:none;border:0;color:#D9D6D0;padding:0 12px;min-height:48px;font:700 14px/1 var(--athletic);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button:hover{color:#fff}
+.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--jhs-gold)}
+.tabs button:focus-visible{outline-color:var(--jhs-gold);outline-offset:-3px}
+@media (max-width:430px){.tabs button{padding:0 9px;font-size:13px;letter-spacing:.05em}}
+
+.wrap{max-width:1040px;margin:0 auto;padding:22px var(--pad) 64px}
+section{display:none}section.on{display:block}
+h2{font:700 clamp(24px,4.4vw,32px)/1.1 var(--athletic);letter-spacing:.04em;text-transform:uppercase;margin:0 0 6px;padding-bottom:8px;border-bottom:2px solid var(--accent);display:inline-block}
+h3{font:700 18px/1.2 var(--athletic);letter-spacing:.05em;text-transform:uppercase;margin:32px 0 8px}
+.sub{color:var(--muted);font-size:14px;margin:6px 0 14px;max-width:72ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 16px}
+.chip{min-height:40px;border:1px solid var(--line);background:var(--bg);padding:0 14px;border-radius:2px;font:700 13px/1 var(--athletic);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--muted)}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+select,input[type=search]{min-height:40px;border:1px solid var(--faint);border-radius:2px;background:var(--bg);padding:0 10px;max-width:100%}
+input[type=search]{width:min(260px,100%)}
+.tw{overflow-x:auto;margin:0 0 8px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font:700 11px/1.2 var(--athletic);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 8px;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:bottom}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+tr.ours td{background:var(--ours)}
+tr.ours td:first-child{box-shadow:inset 3px 0 0 var(--ours-edge)}
+td .s{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.lnk{background:none;border:0;padding:0;color:var(--ink);font-weight:700;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.good{color:var(--good)}.bad{color:var(--bad)}
+.badge{display:inline-block;font:700 10px/1 var(--athletic);letter-spacing:.06em;text-transform:uppercase;padding:3px 5px;border-radius:2px;background:var(--panel);color:var(--ink);border:1px solid var(--line);margin-left:6px;vertical-align:1px}
+.badge.pb{background:var(--jhs-gold);color:var(--jhs-black);border-color:var(--jhs-gold)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0 8px}
+.card{background:var(--panel);border-radius:4px;padding:14px 16px;border-top:3px solid var(--accent)}
+.card .k{font:700 11px/1.2 var(--athletic);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card .v{font:700 26px/1.15 var(--athletic);margin-top:6px}
+.card .s{color:var(--muted);font-size:13px}
+.note{background:var(--panel);border-left:3px solid var(--accent);padding:10px 14px;font-size:14px;color:var(--ink);margin:12px 0;max-width:80ch}
+.dist{display:flex;height:14px;min-width:90px;border-radius:2px;overflow:hidden;background:var(--line)}
+.dist span{display:block;height:100%}
+svg text{fill:var(--muted);font:11px var(--sans)}
+.chart{width:100%;height:auto;display:block;margin:6px 0 4px}
+.foot{max-width:1040px;margin:0 auto;padding:0 var(--pad) 32px;color:var(--muted);font-size:13px}
+.empty{color:var(--muted);padding:20px 0}
+@media (max-width:640px){.hide-s{display:none}}
+</style>
+</head>
+<body>
+<header class="band"><div class="top"><h1>Jesuit Cross Country</h1><p>Results and projections · coaches only</p></div></header>
+<nav class="tabs" aria-label="Sections"><div class="tabs-in" role="tablist" id="tabs"></div></nav>
+<main class="wrap">
+ <section id="t-roster"></section>
+ <section id="t-runner"></section>
+ <section id="t-meets"></section>
+ <section id="t-proj"></section>
+ <section id="t-sim"></section>
+ <section id="t-model"></section>
+</main>
+<footer class="foot" id="foot"></footer>
+<script id="portal-data">window.D = __DATA__;</script>
+<script id="portal-app">
+(function(){
+const D = window.D;
+if (!D || !D.meta) return;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = s => { if (s == null) return ''; const m = Math.floor(s / 60), x = s - 60 * m; return m + ':' + (x < 10 ? '0' : '') + x.toFixed(1); };
+const fmt0 = s => { if (s == null) return ''; s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const pace = (s, mi) => mi ? fmt0(s / mi) + '/mi' : '';
+const pct = v => v == null ? '' : Math.round(100 * v) + '%';
+const date = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+const sdate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+const distLabel = mi => Math.abs(mi - 3.107) < .02 ? '5K' : Math.abs(mi - 1.988) < .02 ? '3200 m' : Math.abs(mi - 2) < .03 ? '2 mi' : Math.abs(mi - 3) < .03 ? '3 mi' : mi.toFixed(2) + ' mi';
+const seasonOf = d => { const y = +d.slice(0, 4), m = +d.slice(5, 7); return m >= 7 ? y : y - 1; };
+const gradeLabel = g => g ? ({9: 'Fr', 10: 'So', 11: 'Jr', 12: 'Sr'}[g] || g) : '';
+const clsLabel = c => c ? '’' + String(c).slice(2) : '';
+const R = D.runners, byId = Object.fromEntries(R.map(r => [r.id, r]));
+const races = D.races, raceById = Object.fromEntries(races.map(r => [r.id, r]));
+const S = {tab: 'roster', rosterAll: false, q: '', runner: (R.find(r => r.current) || R[0] || {}).id, meetSeason: D.meta.season, meet: null, meetView: 'report', champ: 'section', sim: 0, simDiv: null};
+try { Object.assign(S, JSON.parse(localStorage.getItem('jx-ui') || '{}')); } catch (e) {}
+const save = () => { try { localStorage.setItem('jx-ui', JSON.stringify({tab: S.tab, runner: S.runner, meetView: S.meetView, champ: S.champ})); } catch (e) {} };
+
+/* result vs expected, in seconds, against the likely (80%) range */
+function vsExp(sec, exp) {
+  if (!exp) return '';
+  const [raw, e, lo, hi] = exp, d = Math.round(sec - e);
+  const head = Math.abs(d) <= 2 ? 'right on it' : Math.abs(d) + ' s ' + (d < 0 ? 'faster' : 'slower');
+  let tail, cls = '';
+  if (sec < lo) { tail = 'ahead of range by ' + Math.round(lo - sec) + ' s'; cls = 'good'; }
+  else if (sec > hi) { tail = 'past range by ' + Math.round(sec - hi) + ' s'; cls = 'bad'; }
+  else tail = 'inside range';
+  return `<span class="${cls}">${head}</span><span class="s">${tail}</span>`;
+}
+
+/* ---------- tabs ---------- */
+const TABS = [['roster', 'Roster'], ['runner', 'Runner'], ['meets', 'Meets'], ['proj', 'Projections'], ['sim', 'Simulation'], ['model', 'Model']]
+  .filter(([k]) => k !== 'sim' || (D.sims && D.sims.length));
+$('#tabs').innerHTML = TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="false">${l}</button>`).join('');
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(b.dataset.tab); });
+function go(t, scroll = true) {
+  if (!TABS.some(([k]) => k === t)) t = 'roster';
+  S.tab = t; save();
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.querySelectorAll('main section').forEach(s => s.classList.toggle('on', s.id === 't-' + t));
+  ({roster: roster, runner: runner, meets: meets, proj: proj, sim: sim, model: model})[t]();
+  if (scroll) window.scrollTo(0, 0);
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-runner]');
+  if (a) { S.runner = a.dataset.runner; go('runner'); return; }
+  const m = e.target.closest('[data-meet]');
+  if (m) { S.meet = m.dataset.meet; S.meetSeason = seasonOf(m.dataset.meet.split('|')[1]); go('meets'); }
+});
+const nameBtn = r => r ? `<button class="lnk" data-runner="${esc(r.id)}">${esc(r.name)}</button>` : '';
+const chips = (items, cur, attr) => items.map(([v, l]) => `<button class="chip" ${attr}="${esc(v)}" aria-pressed="${String(v) === String(cur)}">${esc(l)}</button>`).join('');
+
+/* ---------- roster ---------- */
+function roster() {
+  const el = $('#t-roster'), sea = D.meta.season;
+  const list = R.filter(r => (S.rosterAll || r.current) && (!S.q || r.name.toLowerCase().includes(S.q.toLowerCase())));
+  const best = r => { const xs = r.races.filter(x => seasonOf(x.date) === sea && x.eq_day); return xs.length ? Math.min(...xs.map(x => x.eq_day)) : null; };
+  const rows = list.map((r, i) => {
+    const last = r.races[r.races.length - 1], n = r.races.filter(x => seasonOf(x.date) === sea).length;
+    return `<tr><td class="r num">${r.current ? i + 1 : ''}</td><td>${nameBtn(r)}<span class="s">${r.current ? gradeLabel(r.grade) + ' · ' : 'Class of ' + (r.cls || '') + ' · '}${esc(last.level)}</span></td>
+      <td class="r num">${fmt(r.rating)}</td><td class="r num hide-s">${fmt(best(r))}</td><td class="r num hide-s">${r.current ? n : r.n}</td>
+      <td class="hide-s"><button class="lnk" style="font-weight:400" data-meet="${esc(last.race)}">${esc(last.meet)}</button><span class="s">${date(last.date)}</span></td></tr>`;
+  }).join('');
+  el.innerHTML = `<h2>Roster</h2>
+   <p class="sub">Rating: each runner's expected time today on the Section finals course (Willow Hills, 5K) in mild weather, from all their races, recent ones counting most. Season best: the fastest single race this season converted to that course on that day.</p>
+   <div class="bar">${chips([[0, D.meta.season + ' season'], [1, 'All years']], +S.rosterAll, 'data-all')}<input type="search" id="rq" placeholder="Find a runner" value="${esc(S.q)}" aria-label="Find a runner"></div>
+   <div class="tw"><table><thead><tr><th class="r">#</th><th>Runner</th><th class="r">Rating</th><th class="r hide-s">Season best</th><th class="r hide-s">Races</th><th class="hide-s">Last race</th></tr></thead><tbody>${rows || '<tr><td colspan="6" class="empty">No runners match.</td></tr>'}</tbody></table></div>`;
+  el.querySelectorAll('[data-all]').forEach(b => b.onclick = () => { S.rosterAll = b.dataset.all === '1'; roster(); });
+  const q = $('#rq'); q.oninput = () => { S.q = q.value; const p = q.selectionStart; roster(); const n = $('#rq'); n.focus(); n.setSelectionRange(p, p); };
+}
+
+/* ---------- runner ---------- */
+function chart(r) {
+  const xs = r.races.filter(x => x.eq_day);
+  if (xs.length < 2) return '';
+  const W = 720, H = 220, L = 44, Rp = 10, T = 12, B = 26;
+  const t = x => new Date(x.date).getTime(), t0 = t(xs[0]), t1 = t(xs[xs.length - 1]) || t0 + 1;
+  const v = xs.map(x => x.eq_day), lo = Math.min(...v), hi = Math.max(...v), pad = Math.max(5, (hi - lo) * .08);
+  const y0 = lo - pad, y1 = hi + pad;
+  const X = x => L + (W - L - Rp) * (t(x) - t0) / Math.max(t1 - t0, 1), Y = s => T + (H - T - B) * (s - y0) / (y1 - y0);
+  const ticks = []; const step = (y1 - y0) > 120 ? 30 : (y1 - y0) > 50 ? 15 : 5;
+  for (let s = Math.ceil(y0 / step) * step; s <= y1; s += step) ticks.push(s);
+  const yrs = []; for (let y = +xs[0].date.slice(0, 4); y <= +xs[xs.length - 1].date.slice(0, 4); y++) yrs.push(y);
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Each race as a Willow Hills 5K time on its day; up is faster">
+   ${ticks.map(s => `<line x1="${L}" x2="${W - Rp}" y1="${Y(s)}" y2="${Y(s)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(s) + 4}" text-anchor="end">${fmt0(s)}</text>`).join('')}
+   ${yrs.map(y => { const d = {date: y + '-09-01'}; const xx = X(d); return xx >= L && xx <= W - Rp ? `<text x="${xx}" y="${H - 6}" text-anchor="middle">${y}</text>` : ''; }).join('')}
+   ${xs.map(x => `<circle cx="${X(x)}" cy="${Y(x.eq_day)}" r="4" fill="var(--bar-ours)" fill-opacity=".85"><title>${esc(x.meet)} ${sdate(x.date)}: ${x.time} (${fmt(x.eq_day)} Willow Hills 5K)</title></circle>`).join('')}
+   ${r.rating ? `<line x1="${L}" x2="${W - Rp}" y1="${Y(r.rating)}" y2="${Y(r.rating)}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${W - Rp}" y="${Y(r.rating) - 5}" text-anchor="end">rating ${fmt(r.rating)}</text>` : ''}
+  </svg>`;
+}
+function runner() {
+  const el = $('#t-runner'), r = byId[S.runner] || R[0];
+  if (!r) { el.innerHTML = '<p class="empty">No runners.</p>'; return; }
+  const opts = R.map(x => `<option value="${esc(x.id)}" ${x.id === r.id ? 'selected' : ''}>${esc(x.name)}${x.current ? '' : ' (' + clsLabel(x.cls) + ')'}</option>`).join('');
+  const champ = c => { const p = r.champs && r.champs[c.key]; return p ? `<div class="card"><div class="k">${esc(c.label)} · ${sdate(c.date)}</div><div class="v num">${fmt(p[0])}</div><div class="s">8 in 10: ${fmt(p[1])} to ${fmt(p[2])}<br>${p[3]}${['st','nd','rd'][((p[3] + 90) % 100 - 10) % 10 - 1] || 'th'} fastest on the team</div></div>` : ''; };
+  const pbs = {}; const hist = r.races.slice().reverse().map(x => {
+    return `<tr><td class="num">${sdate(x.date)}<span class="s">${x.date.slice(0, 4)}</span></td>
+     <td><button class="lnk" style="font-weight:400" data-meet="${esc(x.race)}">${esc(x.meet)}</button><span class="s">${esc(x.level)} · ${distLabel(x.dist)}${x.grade ? ' · gr ' + esc(x.grade) : ''}</span></td>
+     <td class="r num">${esc(x.time)}<span class="s">${pace(x.sec, x.dist)}</span></td><td class="r num hide-s">${x.place || ''}${x.field ? '<span class="s">of ' + x.field + '</span>' : ''}</td>
+     <td class="r num hide-s">${fmt(x.eq_day)}</td><td class="r num">${x.exp ? fmt(x.exp[1]) + '<span class="s">' + fmt0(x.exp[2]) + '–' + fmt0(x.exp[3]) + '</span>' : ''}</td><td>${vsExp(x.sec, x.exp)}</td></tr>`;
+  }).join('');
+  el.innerHTML = `<h2>${esc(r.name)}</h2>
+   <p class="sub">${r.current ? gradeLabel(r.grade) + ', ' : ''}Class of ${r.cls || '?'} · ${r.n} races since ${date(r.first)}</p>
+   <div class="bar"><select id="rsel" aria-label="Runner">${opts}</select></div>
+   <div class="cards">
+    <div class="card"><div class="k">Rating today</div><div class="v num">${fmt(r.rating)}</div><div class="s">Willow Hills 5K, mild weather${r.sd ? '<br>typical swing ±' + Math.round(100 * r.sd * 1.28) + '%' : ''}</div></div>
+    ${D.meta.champs.map(champ).join('')}
+   </div>
+   <h3>Every race on one scale</h3>
+   <p class="sub">Each race converted to a Willow Hills 5K on its day (course, distance and heat taken out). Up is faster. The dashed line is the rating today.</p>
+   ${chart(r)}
+   <h3>Race history</h3>
+   <p class="sub">Expected: the model's projection the morning of the meet, using only earlier races, adjusted for how the rest of the field ran that day. Range: 8 in 10.</p>
+   <div class="tw"><table><thead><tr><th>Date</th><th>Meet</th><th class="r">Time</th><th class="r hide-s">Place</th><th class="r hide-s">5K equiv</th><th class="r">Expected</th><th>Result</th></tr></thead><tbody>${hist}</tbody></table></div>`;
+  $('#rsel').onchange = e => { S.runner = e.target.value; save(); runner(); };
+}
+
+/* ---------- meets ---------- */
+function meets() {
+  const el = $('#t-meets');
+  const seasons = [...new Set(races.map(r => seasonOf(r.date)))].sort((a, b) => b - a);
+  if (!seasons.includes(+S.meetSeason)) S.meetSeason = seasons[0];
+  const ms = {}; races.filter(r => seasonOf(r.date) === +S.meetSeason).forEach(r => { const k = r.date + '|' + r.meet; (ms[k] = ms[k] || []).push(r); });
+  const keys = Object.keys(ms).sort().reverse();
+  let cur = S.meet && raceById[S.meet] ? raceById[S.meet] : null;
+  let mk = cur ? cur.date + '|' + cur.meet : keys[0];
+  if (!ms[mk]) mk = keys[0];
+  const rs = (ms[mk] || []).slice().sort((a, b) => (a.g === b.g ? 0 : a.g === 'M' ? -1 : 1) || ['Varsity', 'JV', 'Soph', 'Frosh/Soph', 'Frosh', 'Youth'].indexOf(a.level) - ['Varsity', 'JV', 'Soph', 'Frosh/Soph', 'Frosh', 'Youth'].indexOf(b.level));
+  const ours = rs.filter(r => r.rows.some(x => x[6]));
+  if (!cur || !rs.includes(cur)) cur = ours[0] || rs[0];
+  S.meet = cur && cur.id;
+  const head = `<h2>Meets</h2>
+   <div class="bar"><select id="msea" aria-label="Season">${seasons.map(s => `<option ${s === +S.meetSeason ? 'selected' : ''}>${s}</option>`).join('')}</select>
+   <select id="mmeet" aria-label="Meet" style="flex:1 1 260px">${keys.map(k => { const [d, m] = k.split('|'); return `<option value="${esc(k)}" ${k === mk ? 'selected' : ''}>${sdate(d)} · ${esc(m)}</option>`; }).join('')}</select></div>`;
+  if (!cur) { el.innerHTML = head + '<p class="empty">No meets.</p>'; return; }
+  const m0 = rs[0];
+  const info = `<p class="sub">${date(m0.date)} · ${esc(m0.course)}${m0.temp != null ? ' · about ' + m0.temp + '°F at race time' : ''}</p>`;
+  const views = chips([['report', 'Report'], ['results', 'Results'], ['teams', 'Team scores']], S.meetView, 'data-view');
+  let body = '';
+  if (S.meetView === 'report') body = report(ours);
+  else {
+    body = `<div class="bar">${chips(rs.map(r => [r.id, r.race.replace(/^(Boys|Girls) /, (a, g) => g[0] + ' ')]), cur.id, 'data-race')}</div>` +
+      `<p class="sub">${esc(cur.race)} · ${esc(cur.level)} · ${distLabel(cur.dist)} · ${cur.n} finishers${cur.day != null ? ' · field ran ' + Math.abs(cur.day).toFixed(1) + '% ' + (cur.day > 0 ? 'faster' : 'slower') + ' than projected' : ''}</p>` +
+      (S.meetView === 'results' ? results(cur) : teams(cur));
+  }
+  el.innerHTML = head + info + `<div class="bar">${views}</div>` + body;
+  $('#msea').onchange = e => { S.meetSeason = +e.target.value; S.meet = null; meets(); };
+  $('#mmeet').onchange = e => { const [d, m] = e.target.value.split('|'); const r = races.find(x => x.date === d && x.meet === m && x.rows.some(y => y[6])) || races.find(x => x.date === d && x.meet === m); S.meet = r.id; meets(); };
+  el.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { S.meetView = b.dataset.view; save(); meets(); });
+  el.querySelectorAll('[data-race]').forEach(b => b.onclick = () => { S.meet = b.dataset.race; meets(); });
+}
+function runnerAt(raceId, name) { for (const r of R) for (const x of r.races) if (x.race === raceId && r.name === name) return [r, x]; return [null, null]; }
+function report(ours) {
+  if (!ours.length) return '<p class="empty">No Jesuit runners at this meet.</p>';
+  return ours.map(rc => {
+    const rows = rc.rows.filter(x => x[6]).map(x => {
+      const [r, h] = runnerAt(rc.id, x[1]);
+      const prev = r ? r.races.filter(y => y.date < rc.date) : [];
+      const pb = r && h && h.eq_day && prev.length && prev.every(y => !y.eq_day || y.eq_day > h.eq_day) ? '<span class="badge pb">Best yet</span>' : '';
+      const first = r && !prev.length ? '<span class="badge">First race</span>' : '';
+      return `<tr class="ours"><td class="r num">${x[0] ?? ''}</td><td>${r ? nameBtn(r) : esc(x[1])}${pb}${first}<span class="s">${x[2] ? 'gr ' + esc(x[2]) : ''}</span></td>
+       <td class="r num">${esc(x[4])}<span class="s">${pace(x[5], rc.dist)}</span></td>
+       <td class="r num hide-s">${h && h.exp ? fmt(h.exp[1]) + '<span class="s">' + fmt0(h.exp[2]) + '–' + fmt0(h.exp[3]) + '</span>' : ''}</td><td>${h ? vsExp(x[5], h.exp) : ''}</td></tr>`;
+    }).join('');
+    const ts = rc.teams.findIndex(t => t.team === 'Jesuit');
+    const team = ts >= 0 ? `Jesuit ${ts + 1}${['st','nd','rd'][ts] || 'th'} of ${rc.teams.length} teams, ${rc.teams[ts].pts} points (unofficial)` : 'Jesuit did not score as a team';
+    return `<h3>${esc(rc.race)}</h3><p class="sub">${esc(rc.level)} · ${distLabel(rc.dist)} · ${rc.n} finishers · ${team}${rc.day != null ? ' · field ran ' + Math.abs(rc.day).toFixed(1) + '% ' + (rc.day > 0 ? 'faster' : 'slower') + ' than projected' : ''}</p>
+     <div class="tw"><table><thead><tr><th class="r">Pl</th><th>Runner</th><th class="r">Time</th><th class="r hide-s">Expected</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('') + '<p class="sub">Expected: projection the morning of the meet from earlier races only, shifted by how the rest of the field ran against their own projections. Green: ahead of the 8-in-10 range. Red: past it.</p>';
+}
+function results(rc) {
+  const nm = Object.fromEntries(R.map(r => [r.name, r]));
+  return `<div class="tw"><table><thead><tr><th class="r">Pl</th><th>Name</th><th class="hide-s">Gr</th><th>Team</th><th class="r">Time</th><th class="r hide-s">Pace</th></tr></thead><tbody>${rc.rows.map(x =>
+    `<tr class="${x[6] ? 'ours' : ''}"><td class="r num">${x[0] ?? ''}</td><td>${x[6] && nm[x[1]] ? nameBtn(nm[x[1]]) : esc(x[1] || '(name hidden)')}${x[7] ? '<span class="badge">Exh</span>' : ''}</td><td class="hide-s">${esc(x[2])}</td><td>${esc(x[3])}</td><td class="r num">${esc(x[4])}</td><td class="r num hide-s">${pace(x[5], rc.dist)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function teams(rc) {
+  if (!rc.teams.length) return '<p class="empty">No team had 5 finishers.</p>';
+  return `<p class="sub">Unofficial: teams with 5 or more finishers, top 5 score, 6th and 7th displace. The meet's official scoring may differ.</p>
+   <div class="tw"><table><thead><tr><th class="r">#</th><th>Team</th><th class="r">Points</th><th>Team places (1-5 score, 6-7 displace)</th></tr></thead><tbody>${rc.teams.map((t, i) =>
+    `<tr class="${t.team === 'Jesuit' ? 'ours' : ''}"><td class="r num">${i + 1}</td><td>${esc(t.team)}</td><td class="r num"><b>${t.pts}</b></td><td class="num">${t.places.map((p, j) => j < 5 ? p : `<span style="color:var(--muted)">${p}</span>`).join(', ')}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ---------- projections ---------- */
+function proj() {
+  const el = $('#t-proj'), c = D.meta.champs.find(x => x.key === S.champ) || D.meta.champs[0];
+  const list = R.filter(r => r.champs && r.champs[c.key]).sort((a, b) => a.champs[c.key][0] - b.champs[c.key][0]);
+  const top5 = list.slice(0, 5).map(r => r.champs[c.key][0]);
+  el.innerHTML = `<h2>Projections</h2>
+   <div class="bar">${chips(D.meta.champs.map(x => [x.key, x.label]), c.key, 'data-champ')}</div>
+   <p class="sub">${date(c.date)} · ${esc(c.course)} · ${distLabel(c.dist)} · ${c.temp}°F expected. Every Jesuit runner who raced this season, in projected order, so no two share a place.${c.field_shift ? ' Includes the Section-day level: at past finals boys ran ' + Math.abs(100 * c.field_shift).toFixed(1) + '% faster than projected from earlier races.' : ''} Who runs depends on qualifying.</p>
+   ${top5.length === 5 ? `<div class="cards"><div class="card"><div class="k">Top 5 average</div><div class="v num">${fmt(top5.reduce((a, b) => a + b) / 5)}</div><div class="s">1-5 spread ${fmt0(top5[4] - top5[0])}</div></div></div>` : ''}
+   <div class="tw"><table><thead><tr><th class="r">#</th><th>Runner</th><th class="r">Expected</th><th class="r">8 in 10</th><th class="r hide-s">Rating today</th></tr></thead><tbody>${list.map(r => { const p = r.champs[c.key];
+     return `<tr class="${p[3] <= 7 ? 'ours' : ''}"><td class="r num">${p[3]}</td><td>${nameBtn(r)}<span class="s">${gradeLabel(r.grade)} · ${esc(r.level)}</span></td><td class="r num"><b>${fmt(p[0])}</b></td><td class="r num">${fmt0(p[1])}–${fmt0(p[2])}</td><td class="r num hide-s">${fmt(r.rating)}</td></tr>`; }).join('')}</tbody></table></div>`;
+  el.querySelectorAll('[data-champ]').forEach(b => b.onclick = () => { S.champ = b.dataset.champ; save(); proj(); });
+}
+
+/* ---------- simulation ---------- */
+function sim() {
+  const el = $('#t-sim'), sims = D.sims || [];
+  if (!sims.length) { el.innerHTML = '<h2>Simulation</h2><p class="empty">No upcoming championship simulation.</p>'; return; }
+  const s = sims[S.sim] || sims[0], divs = Object.keys(s.races), dv = divs.includes(S.simDiv) ? S.simDiv : divs[0], r = s.races[dv];
+  const label = x => x.scenario ? x.meet.split(', ').slice(1).join(', ') || 'Scenario' : 'As modeled';
+  const nt = r.teams.length, col = i => i === 0 ? 'var(--bar-ours)' : `color-mix(in srgb, var(--bar) ${Math.max(15, 100 - i * 18)}%, transparent)`;
+  el.innerHTML = `<h2>Simulation</h2>
+   <p class="sub">${esc(s.meet.split(',')[0])} · ${date(s.date)} · ${esc(s.course)} · ${r.field} runners, ${s.n_sims.toLocaleString()} simulated races, model fitted through ${date(s.fit_through)}.</p>
+   <div class="bar">${chips(sims.map((x, i) => [i, label(x)]), sims.indexOf(s), 'data-sim')}</div>
+   ${divs.length > 1 ? `<div class="bar">${chips(divs.map(d => [d, d]), dv, 'data-div')}</div>` : ''}
+   ${/provisional/i.test(s.meet) ? '<div class="note">Provisional field: last year\'s teams in this division, each with its 7 best-rated runners this season. It will be rebuilt from the real qualifiers once Subsection results post.</div>' : ''}
+   <h3>Teams</h3>
+   <div class="tw"><table><thead><tr><th>Team</th><th class="r">Win</th><th>Place chances, 1st at left</th><th class="r hide-s">Points, 8 in 10</th><th class="r">To State</th></tr></thead><tbody>${r.teams.map(t =>
+    `<tr class="${t.team === 'Jesuit' ? 'ours' : ''}"><td>${esc(t.team)}<span class="s">avg place ${t.place_dist.reduce((a, p, i) => a + p * (i + 1), 0).toFixed(1)}</span></td><td class="r num"><b>${pct(t.win)}</b></td>
+     <td><div class="dist" title="${t.place_dist.map((p, i) => (i + 1) + ': ' + pct(p)).join(', ')}">${t.place_dist.map((p, i) => p > .004 ? `<span style="width:${100 * p}%;background:${col(i)}"></span>` : '').join('')}</div></td>
+     <td class="r num hide-s">${t.pts_med}<span class="s">${t.pts_lo}–${t.pts_hi}</span></td><td class="r num">${pct(t.state)}</td></tr>`).join('')}</tbody></table></div>
+   <h3>Jesuit runners</h3>
+   <div class="tw"><table><thead><tr><th>Runner</th><th class="r">Expected</th><th class="r hide-s">8 in 10</th><th class="r">Place</th><th class="r hide-s">Place 8 in 10</th><th class="r">Top 10</th></tr></thead><tbody>${r.runners.filter(x => x.Team === 'Jesuit').map(x => { const rr = R.find(y => y.name === x.name && y.current);
+    return `<tr class="ours"><td>${rr ? nameBtn(rr) : esc(x.name)}<span class="s">gr ${esc(x.grade)}</span></td><td class="r num"><b>${fmt(x.pred)}</b></td><td class="r num hide-s">${fmt0(x.lo)}–${fmt0(x.hi)}</td><td class="r num">${x.place_med}</td><td class="r num hide-s">${x.place_lo}–${x.place_hi}</td><td class="r num">${pct(x.top10)}</td></tr>`; }).join('')}</tbody></table></div>
+   <h3>Projected top 20</h3>
+   <div class="tw"><table><thead><tr><th class="r">#</th><th>Runner</th><th>Team</th><th class="r">Expected</th><th class="r hide-s">Top 10</th></tr></thead><tbody>${r.runners.slice(0, 20).map(x =>
+    `<tr class="${x.Team === 'Jesuit' ? 'ours' : ''}"><td class="r num">${x.place_med}</td><td>${esc(x.name)}</td><td>${esc(x.Team)}</td><td class="r num">${fmt(x.pred)}</td><td class="r num hide-s">${pct(x.top10)}</td></tr>`).join('')}</tbody></table></div>
+   <p class="sub">Each simulated race draws every runner's time around their projection with their own spread. Unofficial scoring: teams of 5+, top 5 score, 6th and 7th displace. State: the top teams by the measured allocation for this division, then up to 5 individuals not on those teams. Places are distinct, ordered by projected time.</p>`;
+  el.querySelectorAll('[data-sim]').forEach(b => b.onclick = () => { S.sim = +b.dataset.sim; sim(); });
+  el.querySelectorAll('[data-div]').forEach(b => b.onclick = () => { S.simDiv = b.dataset.div; sim(); });
+}
+
+/* ---------- model ---------- */
+function model() {
+  const a = D.meta.accuracy || {}, el = $('#t-model');
+  const row = (k, x) => `<tr><td>${esc(k)}</td><td class="r num">${x.n.toLocaleString()}</td><td class="r num">${x.mape}%</td><td class="r num hide-s">${x.lean > 0 ? '+' : ''}${x.lean}%</td><td class="r num">${x.cover}%</td></tr>`;
+  el.innerHTML = `<h2>Model</h2>
+   <p class="sub">How the projections are made and how well they have held up.</p>
+   ${a.all ? `<div class="cards">
+    <div class="card"><div class="k">Jesuit typical miss</div><div class="v num">${a.jesuit.mape}%</div><div class="s">about ${Math.round(a.jesuit.mape * 9.6)} s in a 16-minute 5K</div></div>
+    <div class="card"><div class="k">Inside 8-in-10 range</div><div class="v num">${a.jesuit.cover}%</div><div class="s">Jesuit runners (80% is right)</div></div>
+    <div class="card"><div class="k">All runners</div><div class="v num">${a.all.mape}%</div><div class="s">${a.all.n.toLocaleString()} predictions</div></div>
+    <div class="card"><div class="k">Order within a race</div><div class="v num">${a.within}%</div><div class="s">miss after the day's conditions</div></div></div>
+   <h3>Strict backtest</h3>
+   <p class="sub">Before each meet date since ${date(a.since.slice(0, 10))} the model was refit on earlier races only and asked to predict that meet. Lean +: predicted slower than run.</p>
+   <div class="tw"><table><thead><tr><th>Group</th><th class="r">Predictions</th><th class="r">Typical miss</th><th class="r hide-s">Lean</th><th class="r">In range</th></tr></thead><tbody>
+    ${row('All runners', a.all)}${row('Jesuit', a.jesuit)}${a.by_year.map(x => row('Jesuit ' + x.year, x)).join('')}${a.by_level.map(x => row('All runners, ' + x.level, x)).join('')}</tbody></table></div>` : ''}
+   <h3>How it works</h3>
+   <div class="sub"><p>Every race is put on one scale: the pace a runner would hold for 5K, with the distance scaled by a fitted exponent (${D.meta.riegel}) so 2-mile, 3-mile and 3200 m races count too.</p>
+   <p>Course and race effects are fitted from runners who ran more than one race, with Willow Hills (the Section finals) at zero. Heat is a separate term from the race-time weather.</p>
+   <p>Each runner's rating weights recent races most and lets a single bad day count less. In-season improvement is fitted by school grade: freshmen improve fastest, seniors least.</p>
+   <p>Ranges are 8 in 10: about one race in five should land outside, half of those on each side.</p>
+   <p>Real race results are never edited or left out. Only source errors are fixed, such as a finisher posted twice.</p></div>`;
+}
+
+$('#foot').innerHTML = `Data through ${date(D.meta.as_of)} · ${D.meta.n_meets} meets, ${D.meta.n_races} races with Jesuit runners, ${D.meta.n_runners} Jesuit athletes since 2021. Results from athletic.net. Team scores are unofficial.`;
+go(S.tab, false);
+})();
+</script>
+</body>
+</html>

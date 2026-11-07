@@ -1,0 +1,26 @@
+<div id="jx-gate" hidden><header class="band"><div class="top"><h1>Jesuit Cross Country</h1><p>Results and projections · coaches only</p></div></header><div class="jx-in"><div class="jx-box"><h2>Jesuit XC results</h2><p class="sub">Loading…</p></div></div></div>
+<script>
+// Show "Loading..." only if the portal takes more than a moment (a return visit opens from the saved copy in well under
+// that, so there is no flash). Separate from gate.js, so even if that script fails to run the page is never silently blank.
+(function () {
+  var g = document.getElementById('jx-gate');
+  setTimeout(function () { if (!window.JX_STARTED && g.hidden) g.hidden = false; }, 600);
+  setTimeout(function () {
+    if (window.JX_STARTED || window.JX_GATE_RUNNING) return;   // gate.js has its own watchdog with details
+    g.querySelector('.jx-box').innerHTML = '<h2>Couldn\'t start</h2><p>The page failed to start. Please try again.</p>' +
+      '<p><button class="chip jx-go" onclick="location.reload()">Try again</button></p>';
+    g.hidden = false;
+  }, 20000);
+})();
+</script>
+<div id="jx-members" hidden><div class="jx-panel">
+ <div class="jx-head"><h2 style="margin:0">Members</h2><button class="chip" data-jx="close">Close</button></div>
+ <p class="sub" style="margin-top:8px">Anyone listed here can sign in with that Google account. Admins can add and remove members; coaches can view everything.</p>
+ <div class="jx-list"></div>
+ <h3 style="margin:0 0 8px">Invite someone</h3>
+ <form id="jx-add"><input name="email" type="email" placeholder="Email (their Google account)" autocomplete="off" required>
+  <input name="name" placeholder="Name (optional)" autocomplete="off">
+  <select name="role" aria-label="Role"><option value="coach">Coach</option><option value="admin">Admin</option></select>
+  <button class="chip jx-go" type="submit">Add</button></form>
+ <p class="sub" style="margin-top:10px">Then send them the link. There is no automatic invite email.</p>
+</div></div>
