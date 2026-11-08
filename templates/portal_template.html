@@ -323,7 +323,7 @@ function sim() {
    <h3>Projected top 20</h3>
    <div class="tw"><table><thead><tr><th class="r">#</th><th>Runner</th><th>Team</th><th class="r">Expected</th><th class="r hide-s">Top 10</th></tr></thead><tbody>${r.runners.slice(0, 20).map(x =>
     `<tr class="${x.Team === 'Jesuit' ? 'ours' : ''}"><td class="r num">${x.place_med}</td><td>${esc(x.name)}</td><td>${esc(x.Team)}</td><td class="r num">${fmt(x.pred)}</td><td class="r num hide-s">${pct(x.top10)}</td></tr>`).join('')}</tbody></table></div>
-   <p class="sub">Each simulated race draws every runner's time around their projection with their own spread. Unofficial scoring: teams of 5+, top 5 score, 6th and 7th displace. State: the top teams by the measured allocation for this division, then up to 5 individuals not on those teams. Places are distinct, ordered by projected time.</p>`;
+   <p class="sub">Each simulated race draws every runner's time around their projection with their own spread. Unofficial scoring: teams of 5+, top 5 score, 6th and 7th displace. State (CIF handbook 2026): the top ${r.teams_to_state ?? 'qualifying'} teams, then up to 5 individuals not on those teams who finish in the top ${r.indiv_place_max ?? 16}. No alternates. Places are distinct, ordered by projected time.</p>`;
   el.querySelectorAll('[data-sim]').forEach(b => b.onclick = () => { S.sim = +b.dataset.sim; sim(); });
   el.querySelectorAll('[data-div]').forEach(b => b.onclick = () => { S.simDiv = b.dataset.div; sim(); });
 }
