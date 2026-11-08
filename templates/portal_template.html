@@ -81,7 +81,13 @@ td .s{display:block;color:var(--muted);font-size:12px;line-height:1.35}
 .dist{display:flex;height:14px;min-width:90px;border-radius:2px;overflow:hidden;background:var(--line)}
 .dist span{display:block;height:100%}
 svg text{fill:var(--muted);font:11px var(--sans)}
-.chart{width:100%;height:auto;display:block;margin:6px 0 4px}
+.chart{width:100%;height:auto;display:block;margin:4px 0 4px}
+.ckey{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted);margin:2px 0 4px}
+.ckey span{display:inline-flex;align-items:center;gap:6px}
+.ckey i{display:inline-block;flex:none}
+.ckey .kd{width:9px;height:9px;border-radius:50%;background:var(--bar-ours)}.ckey .kd.old{background:var(--bar);opacity:.6}
+.ckey .kr{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink)}
+.ckey .kl{width:18px;border-top:2px dashed var(--ink)}
 .foot{max-width:1040px;margin:0 auto;padding:0 var(--pad) 32px;color:var(--muted);font-size:13px}
 .empty{color:var(--muted);padding:20px 0}
 @media (max-width:640px){.hide-s{display:none}}
@@ -177,22 +183,32 @@ function roster() {
 
 /* ---------- runner ---------- */
 function chart(r) {
+  /* Each season is its own panel (Aug to Nov), so the off-season does not take up width. Drawn at the real width of the
+     page so the text stays readable on a phone. The current season is in brand color, earlier seasons muted. */
   const xs = r.races.filter(x => x.eq_day);
   if (xs.length < 2) return '';
-  const W = 720, H = 220, L = 44, Rp = 10, T = 12, B = 26;
-  const t = x => new Date(x.date).getTime(), t0 = t(xs[0]), t1 = t(xs[xs.length - 1]) || t0 + 1;
-  const v = xs.map(x => x.eq_day), lo = Math.min(...v), hi = Math.max(...v), pad = Math.max(5, (hi - lo) * .08);
-  const y0 = lo - pad, y1 = hi + pad;
-  const X = x => L + (W - L - Rp) * (t(x) - t0) / Math.max(t1 - t0, 1), Y = s => T + (H - T - B) * (s - y0) / (y1 - y0);
-  const ticks = []; const step = (y1 - y0) > 120 ? 30 : (y1 - y0) > 50 ? 15 : 5;
-  for (let s = Math.ceil(y0 / step) * step; s <= y1; s += step) ticks.push(s);
-  const yrs = []; for (let y = +xs[0].date.slice(0, 4); y <= +xs[xs.length - 1].date.slice(0, 4); y++) yrs.push(y);
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Each race as a Willow Hills 5K time on its day; up is faster">
-   ${ticks.map(s => `<line x1="${L}" x2="${W - Rp}" y1="${Y(s)}" y2="${Y(s)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(s) + 4}" text-anchor="end">${fmt0(s)}</text>`).join('')}
-   ${yrs.map(y => { const d = {date: y + '-09-01'}; const xx = X(d); return xx >= L && xx <= W - Rp ? `<text x="${xx}" y="${H - 6}" text-anchor="middle">${y}</text>` : ''; }).join('')}
-   ${xs.map(x => `<circle cx="${X(x)}" cy="${Y(x.eq_day)}" r="4" fill="var(--bar-ours)" fill-opacity=".85"><title>${esc(x.meet)} ${sdate(x.date)}: ${x.time} (${fmt(x.eq_day)} Willow Hills 5K)</title></circle>`).join('')}
-   ${r.rating ? `<line x1="${L}" x2="${W - Rp}" y1="${Y(r.rating)}" y2="${Y(r.rating)}" stroke="var(--ink)" stroke-dasharray="4 4"/><text x="${W - Rp}" y="${Y(r.rating) - 5}" text-anchor="end">rating ${fmt(r.rating)}</text>` : ''}
-  </svg>`;
+  const box = $('#t-runner'), W = Math.max(300, Math.min(1000, Math.round((box && box.clientWidth) || 720)));
+  const small = W < 520, H = small ? 240 : 260, L = 46, Rp = 8, T = 10, B = 24, GAP = small ? 10 : 16;
+  const seas = [...new Set(xs.map(x => seasonOf(x.date)))].sort();
+  const pw = (W - L - Rp - GAP * (seas.length - 1)) / seas.length;
+  const doy = d => { const t = new Date(d + 'T12:00:00'), y = seasonOf(d); return (t - new Date(y + '-07-25T12:00:00')) / 864e5; };
+  const SPAN = 135;   /* Jul 25 to Dec 7 */
+  const X = x => { const k = seas.indexOf(seasonOf(x.date)); return L + k * (pw + GAP) + pw * Math.min(1, Math.max(0, doy(x.date) / SPAN)); };
+  const v = xs.map(x => x.eq_day).concat(r.rating ? [r.rating] : []), lo = Math.min(...v), hi = Math.max(...v), pad = Math.max(5, (hi - lo) * .08);
+  const y0 = lo - pad, y1 = hi + pad, Y = s => T + (H - T - B) * (s - y0) / (y1 - y0);
+  const rng = y1 - y0, step = rng > 240 ? 60 : rng > 120 ? 30 : rng > 50 ? 15 : 5;
+  const ticks = []; for (let s = Math.ceil(y0 / step) * step; s <= y1; s += step) ticks.push(s);
+  const cur = D.meta.season, last = xs[xs.length - 1];
+  const panels = seas.map((y, k) => { const x0 = L + k * (pw + GAP);
+    return `<rect x="${x0}" y="${T}" width="${pw}" height="${H - T - B}" fill="var(--panel)" opacity="${y === cur ? 1 : .55}" rx="4"/>
+      <text x="${x0 + pw / 2}" y="${H - 6}" text-anchor="middle" style="font-weight:700${y === cur ? ';fill:var(--ink)' : ''}">${y}</text>`; }).join('');
+  const grid = ticks.map(s => `<line x1="${L}" x2="${W - Rp}" y1="${Y(s)}" y2="${Y(s)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(s) + 4}" text-anchor="end">${fmt0(s)}</text>`).join('');
+  const dots = xs.map(x => { const now = seasonOf(x.date) === cur;
+    return `<circle cx="${X(x).toFixed(1)}" cy="${Y(x.eq_day).toFixed(1)}" r="${small ? 4 : 4.5}" fill="${now ? 'var(--bar-ours)' : 'var(--bar)'}" fill-opacity="${now ? .9 : .6}"><title>${esc(x.meet)} ${sdate(x.date)} ${x.date.slice(0, 4)}: ${x.time} (${fmt(x.eq_day)} as a Willow Hills 5K)</title></circle>`; }).join('');
+  const ring = `<circle cx="${X(last).toFixed(1)}" cy="${Y(last.eq_day).toFixed(1)}" r="8" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+  const rate = r.rating ? `<line x1="${L}" x2="${W - Rp}" y1="${Y(r.rating)}" y2="${Y(r.rating)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 4"/>` : '';
+  const key = `<div class="ckey"><span><i class="kd"></i>${cur} race</span>${seas.length > 1 && seas[0] < cur ? '<span><i class="kd old"></i>earlier season</span>' : ''}<span><i class="kr"></i>latest: ${esc(last.meet)}, ${fmt(last.eq_day)}</span>${r.rating ? `<span><i class="kl"></i>rating today ${fmt(r.rating)}</span>` : ''}</div>`;
+  return key + `<svg class="chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Each race as a Willow Hills 5K time on its day, one panel per season, August to November; up is faster">${panels}${grid}${rate}${dots}${ring}</svg>`;
 }
 function runner() {
   const el = $('#t-runner'), r = byId[S.runner] || R[0];
@@ -213,7 +229,7 @@ function runner() {
     ${D.meta.champs.map(champ).join('')}
    </div>
    <h3>Every race on one scale</h3>
-   <p class="sub">Each race converted to a Willow Hills 5K on its day (course, distance and heat taken out). Up is faster. The dashed line is the rating today.</p>
+   <p class="sub">Each race converted to a Willow Hills 5K on its day (course, distance and heat taken out). Up is faster. One panel per season, August to November.</p>
    ${chart(r)}
    <h3>Race history</h3>
    <p class="sub">Expected: the model's projection the morning of the meet, using only earlier races, adjusted for how the rest of the field ran that day. Range: 8 in 10.</p>
@@ -352,6 +368,7 @@ function model() {
 }
 
 $('#foot').innerHTML = `Data through ${date(D.meta.as_of)} · ${D.meta.n_meets} meets, ${D.meta.n_races} races with Jesuit runners, ${D.meta.n_runners} Jesuit athletes since 2021. Results from athletic.net. Team scores are unofficial.`;
+let rw = 0, lastW = innerWidth; window.addEventListener('resize', () => { clearTimeout(rw); rw = setTimeout(() => { if (innerWidth !== lastW) { lastW = innerWidth; if (S.tab === 'runner') runner(); } }, 200); });
 go(S.tab, false);
 })();
 </script>
