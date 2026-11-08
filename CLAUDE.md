@@ -22,8 +22,11 @@ portal (../../delta-hawks/web, read only); no shared code.
 - Look: Kevin's Jesuit Sacramento design system (https://claude.ai/artifact/WennPLMmW69KLVtk1adtp3, project/tokens.json).
   Positive theme on white, reverse on JHS Black (#231F20); accent red #C41230 in light, gold #FDB913 in dark; gold never as
   text on white, red never as text on black; header band is block-deep with the athletic face (Eurostile, falling back to
-  Helvetica Neue) in gold. Text only: no logo art, and the guide forbids recreating the mark. Radii 0-4 px. Jesuit rows
-  get a light gold tint with a gold left edge.
+  Helvetica Neue) in gold, a 4 px JHS Red rule under it. Header and sign-in screen show the mascot mark Kevin supplied
+  (2026-11-07) at 96 px (the guide's minimum logo width), inlined in the template CSS as a 192 px PNG (.jx-logo): the
+  supplied art cropped to its circle with clear corners, otherwise unchanged. Never redraw or recolor the mark. Header
+  subtitle is "Results and projections" (Kevin dropped "coaches only"). Radii 0-4 px. Jesuit rows get a light gold
+  tint with a gold left edge.
 - Tabs: Roster (rating = Willow Hills 5K today), Runner (chart of every race as a Willow Hills 5K on its day; history with
   the strict pre-meet expected time, shifted by how the rest of the field ran, and the 8-in-10 range), Meets (Report,
   Results, Team scores), Projections (Section finals and State for every current runner, distinct places by projected
