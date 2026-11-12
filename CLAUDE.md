@@ -29,7 +29,9 @@ portal (../../delta-hawks/web, read only); no shared code.
   tint with a gold left edge.
 - Tabs: Roster (rating = Willow Hills 5K today), Runner (chart of every race as a Willow Hills 5K on its day; history with
   the strict pre-meet expected time, shifted by how the rest of the field ran, and the 8-in-10 range), Meets (Report,
-  Results, Team scores), Projections (Section finals and State for every current runner, distinct places by projected
+  Results, Team scores), Courses (course ratings from
+  portal_data's courses block: each course and distance vs the Section finals course, weather-neutral, with a Willow Hills
+  5K time box that converts to time there; filters Jesuit this season, Jesuit any year, all), Projections (Section finals and State for every current runner, distinct places by projected
   time), Simulation (section_sim.py results, shown when data has D.sims), Model (strict backtest).
 - Team scores are unofficial: teams of 5+, top 5 score, 6th and 7th displace, exhibition and unattached left out.
 - Before any commit: run ../pipeline/scripts/check_web_clean.py, which searches this repo for every athlete name in the

@@ -90,6 +90,12 @@ svg text{fill:var(--muted);font:11px var(--sans)}
 .ckey .kl{width:18px;border-top:2px dashed var(--ink)}
 .foot{max-width:1040px;margin:0 auto;padding:0 var(--pad) 32px;color:var(--muted);font-size:13px}
 .empty{color:var(--muted);padding:20px 0}
+.cbar{position:relative;display:block;width:120px;height:10px;background:var(--line);border-radius:2px;margin:4px 0 3px}
+.cbar::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;border-left:1px solid var(--ink)}
+.cbar span{position:absolute;top:0;bottom:0}.cbar .f{background:var(--bar-ours);border-radius:2px 0 0 2px}.cbar .s{background:var(--bar);border-radius:0 2px 2px 0}
+.tlab{display:inline-flex;align-items:center;gap:8px;font:700 13px/1 var(--athletic);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tlab input{min-height:40px;border:1px solid var(--faint);border-radius:2px;background:var(--bg);padding:0 10px;width:84px;font:600 15px var(--sans);color:var(--ink)}
+@media (max-width:640px){.cbar{width:64px}}
 @media (max-width:640px){.hide-s{display:none}}
 </style>
 </head>
@@ -100,6 +106,7 @@ svg text{fill:var(--muted);font:11px var(--sans)}
  <section id="t-roster"></section>
  <section id="t-runner"></section>
  <section id="t-meets"></section>
+ <section id="t-courses"></section>
  <section id="t-proj"></section>
  <section id="t-sim"></section>
  <section id="t-model"></section>
@@ -124,9 +131,9 @@ const gradeLabel = g => g ? ({9: 'Fr', 10: 'So', 11: 'Jr', 12: 'Sr'}[g] || g) : 
 const clsLabel = c => c ? '’' + String(c).slice(2) : '';
 const R = D.runners, byId = Object.fromEntries(R.map(r => [r.id, r]));
 const races = D.races, raceById = Object.fromEntries(races.map(r => [r.id, r]));
-const S = {tab: 'roster', rosterAll: false, q: '', runner: (R.find(r => r.current) || R[0] || {}).id, meetSeason: D.meta.season, meet: null, meetView: 'report', champ: 'section', sim: 0, simDiv: null};
+const S = {tab: 'roster', rosterAll: false, q: '', runner: (R.find(r => r.current) || R[0] || {}).id, meetSeason: D.meta.season, meet: null, meetView: 'report', champ: 'section', sim: 0, simDiv: null, crsWho: 'season', crsQ: '', crsT: 960};
 try { Object.assign(S, JSON.parse(localStorage.getItem('jx-ui') || '{}')); } catch (e) {}
-const save = () => { try { localStorage.setItem('jx-ui', JSON.stringify({tab: S.tab, runner: S.runner, meetView: S.meetView, champ: S.champ})); } catch (e) {} };
+const save = () => { try { localStorage.setItem('jx-ui', JSON.stringify({tab: S.tab, runner: S.runner, meetView: S.meetView, champ: S.champ, crsWho: S.crsWho, crsT: S.crsT})); } catch (e) {} };
 
 /* result vs expected, in seconds, against the likely (80%) range */
 function vsExp(sec, exp) {
@@ -141,7 +148,7 @@ function vsExp(sec, exp) {
 }
 
 /* ---------- tabs ---------- */
-const TABS = [['roster', 'Roster'], ['runner', 'Runner'], ['meets', 'Meets'], ['proj', 'Projections'], ['sim', 'Simulation'], ['model', 'Model']]
+const TABS = [['roster', 'Roster'], ['runner', 'Runner'], ['meets', 'Meets'], ['courses', 'Courses'], ['proj', 'Projections'], ['sim', 'Simulation'], ['model', 'Model']]
   .filter(([k]) => k !== 'sim' || (D.sims && D.sims.length));
 $('#tabs').innerHTML = TABS.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="false">${l}</button>`).join('');
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(b.dataset.tab); });
@@ -150,7 +157,7 @@ function go(t, scroll = true) {
   S.tab = t; save();
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
   document.querySelectorAll('main section').forEach(s => s.classList.toggle('on', s.id === 't-' + t));
-  ({roster: roster, runner: runner, meets: meets, proj: proj, sim: sim, model: model})[t]();
+  ({roster: roster, runner: runner, meets: meets, courses: courses, proj: proj, sim: sim, model: model})[t]();
   if (scroll) window.scrollTo(0, 0);
 }
 document.addEventListener('click', e => {
@@ -303,6 +310,40 @@ function teams(rc) {
 }
 
 /* ---------- projections ---------- */
+function courses() {
+  /* Course ratings from the model: each course and distance against the Section finals course (Willow Hills 5K in November),
+     heat and season timing taken out. "Time here" converts a Willow Hills 5K time with the fitted distance exponent. */
+  const el = $('#t-courses'), C = D.courses || [], sea = D.meta.season, T = S.crsT || 960;
+  const split = c => { const i = c.lastIndexOf(', '); return i > 0 ? [c.slice(0, i), c.slice(i + 2)] : [c, '']; };
+  const here = x => T * Math.exp(x.eff) * Math.pow(x.dist / D.meta.ref_mi, D.meta.riegel);
+  const pctTxt = e => { const p = 100 * (Math.exp(e) - 1); return Math.abs(p) < 0.05 ? 'same' : Math.abs(p).toFixed(1) + '% ' + (p < 0 ? 'faster' : 'slower'); };
+  const conf = n => n >= 1000 ? 'solid' : n >= 200 ? 'fair' : 'thin';
+  const MAXE = 0.12, bar = e => { const w = Math.min(1, Math.abs(e) / MAXE) * 50;
+    return `<span class="cbar" aria-hidden="true"><span style="${e < 0 ? 'right:50%' : 'left:50%'};width:${w.toFixed(1)}%" class="${e < 0 ? 'f' : 's'}"></span></span>`; };
+  const q = (S.crsQ || '').toLowerCase();
+  const list = C.filter(x => (S.crsWho === 'all' || (S.crsWho === 'jes' ? x.jes > 0 : x.jes_seasons.includes(sea))) && (!q || x.course.toLowerCase().includes(q)))
+    .sort((a, b) => a.eff - b.eff);
+  const rows = list.map(x => { const [nm, city] = split(x.course), ref = x.course === D.meta.ref_course && Math.abs(x.dist - D.meta.ref_mi) < .02;
+    const jl = x.jes_last && raceById[x.jes_last];
+    return `<tr class="${ref ? 'ours' : ''}"><td>${esc(nm)} <b class="num">${distLabel(x.dist)}</b><span class="s">${esc(city)}${ref ? ' · Section finals course' : ''}</span></td>
+      <td class="num">${bar(x.eff)}<span class="s">${pctTxt(x.eff)}</span></td>
+      <td class="r num"><b>${fmt(here(x))}</b></td>
+      <td class="r num hide-s">${x.early != null ? pctTxt(x.early) : ''}</td>
+      <td class="hide-s">${x.n} race${x.n === 1 ? '' : 's'}<span class="s">${conf(x.links)} · ${x.first.slice(0, 4)}${x.last.slice(0, 4) !== x.first.slice(0, 4) ? '–' + x.last.slice(0, 4) : ''}${x.temp != null ? ' · ' + x.temp + '°F typical' : ''}</span></td>
+      <td class="hide-s">${x.jes ? `${x.jes} race${x.jes === 1 ? '' : 's'}${jl ? `<span class="s"><button class="lnk" style="font-weight:400" data-meet="${esc(x.jes_last)}">${esc(jl.meet)}</button> ${x.jes_last.split('|')[1].slice(0, 4)}</span>` : ''}` : ''}</td></tr>`; }).join('');
+  el.innerHTML = `<h2>Courses</h2>
+   <p class="sub">How fast each course and distance runs against the Section finals course (Willow Hills 5K in November), with heat and time of season taken out. Time here: what a runner with this Willow Hills 5K time runs there in mild weather.</p>
+   <div class="bar"><label class="tlab">Willow Hills 5K <input id="crsT" inputmode="decimal" value="${fmt0(T)}" aria-label="Willow Hills 5K time, minutes and seconds" size="6"></label>
+    ${chips([['season', 'Jesuit ' + sea], ['jes', 'Jesuit any year'], ['all', 'All courses']], S.crsWho, 'data-who')}
+    <input type="search" id="crsQ" placeholder="Find a course" value="${esc(S.crsQ || '')}" aria-label="Find a course"></div>
+   <div class="tw"><table><thead><tr><th>Course</th><th>Vs Section</th><th class="r">Time here</th><th class="r hide-s">Aug–Sep</th><th class="hide-s">Based on</th><th class="hide-s">Jesuit</th></tr></thead>
+   <tbody>${rows || '<tr><td colspan="6" class="empty">No courses match.</td></tr>'}</tbody></table></div>
+   <p class="sub">Fastest first. Based on: the model rates a course from runners who also raced elsewhere; solid is 1,000+ of those links, fair 200+, thin fewer. Aug–Sep: where the model keeps a separate reading for early-season races on that course; early races there also carry some early-season effects the heat term does not catch. Distances are scaled with the fitted exponent (${D.meta.riegel}), so a 2-mile time is converted too.</p>`;
+  el.querySelectorAll('[data-who]').forEach(b => b.onclick = () => { S.crsWho = b.dataset.who; save(); courses(); });
+  const qi = $('#crsQ'); qi.oninput = () => { S.crsQ = qi.value; const p = qi.selectionStart; courses(); const n = $('#crsQ'); n.focus(); n.setSelectionRange(p, p); };
+  const ti = $('#crsT'); ti.onchange = () => { const m = ti.value.trim().match(/^(\d{1,2}):(\d{1,2}(?:\.\d+)?)$/);
+    if (m && +m[2] < 60) { S.crsT = 60 * +m[1] + +m[2]; save(); } courses(); };
+}
 function proj() {
   const el = $('#t-proj'), c = D.meta.champs.find(x => x.key === S.champ) || D.meta.champs[0];
   const list = R.filter(r => r.champs && r.champs[c.key]).sort((a, b) => a.champs[c.key][0] - b.champs[c.key][0]);
